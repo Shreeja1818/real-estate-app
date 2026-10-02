@@ -65,8 +65,13 @@ function renderProperties(list) {
     `;
 
     const favBtn = card.querySelector(".fav-btn");
-    favBtn.addEventListener("click", function () {
+    favBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
       toggleFavorite(property.id);
+    });
+
+    card.addEventListener("click", function () {
+      openModal(property);
     });
 
     propertyGrid.appendChild(card);
@@ -127,5 +132,58 @@ showFavoritesBtn.addEventListener("click", function () {
 });
 
 
+const modal = document.getElementById("modal");
+const modalContent = document.getElementById("modalContent");
+const closeModalBtn = document.getElementById("closeModal");
+
+function openModal(property) {
+  const typeName =
+    property.type.charAt(0).toUpperCase() + property.type.slice(1);
+
+  let pricePerSqft = "";
+  if (property.purpose === "sale") {
+    pricePerSqft =
+      "<div>💰 ₹" +
+      Math.round(property.price / property.area).toLocaleString("en-IN") +
+      " per sqft</div>";
+  }
+
+  modalContent.innerHTML = `
+    <img src="${property.image}" alt="${property.title}">
+    <div class="modal-info">
+      <p class="price">${formatPrice(property.price, property.purpose)}</p>
+      <h2>${property.title}</h2>
+      <p class="location">📍 ${property.city}</p>
+      <div class="modal-grid">
+        <div>🏠 Type: ${typeName}</div>
+        <div>🏷 For: ${property.purpose === "sale" ? "Sale" : "Rent"}</div>
+        <div>🛏 ${property.bedrooms} Bedrooms</div>
+        <div>🚿 ${property.bathrooms} Bathrooms</div>
+        <div>📐 ${property.area} sqft</div>
+        ${pricePerSqft}
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+function closeModal() {
+  modal.classList.add("hidden");
+}
+
+closeModalBtn.addEventListener("click", closeModal);
+
+modal.addEventListener("click", function (event) {
+  if (event.target === modal) {
+    closeModal();
+  }
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeModal();
+  }
+});
 updateFavCount();
 applyFilters();
