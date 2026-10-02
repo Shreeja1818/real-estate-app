@@ -1,6 +1,12 @@
 
 const propertyGrid = document.getElementById("propertyGrid");
 const resultCount = document.getElementById("resultCount");
+const favCount = document.getElementById("favCount");
+const showFavoritesBtn = document.getElementById("showFavorites");
+
+
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+let showOnlyFavorites = false;
 
 
 function formatPrice(price, purpose) {
@@ -9,6 +15,24 @@ function formatPrice(price, purpose) {
 }
 
 
+function updateFavCount() {
+  favCount.textContent = favorites.length;
+}
+
+function toggleFavorite(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(function (favId) {
+      return favId !== id;
+    });
+  } else {
+    favorites.push(id);
+  }
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+  updateFavCount();
+  applyFilters();
+}
+
+ 
 function renderProperties(list) {
   propertyGrid.innerHTML = "";
 
@@ -22,9 +46,11 @@ function renderProperties(list) {
     const card = document.createElement("div");
     card.className = "card";
 
+    const heart = favorites.includes(property.id) ? "❤️" : "🤍";
+
     card.innerHTML = `
       <span class="badge">For ${property.purpose}</span>
-      <button class="fav-btn">🤍</button>
+      <button class="fav-btn">${heart}</button>
       <img src="${property.image}" alt="${property.title}">
       <div class="card-body">
         <p class="price">${formatPrice(property.price, property.purpose)}</p>
@@ -37,6 +63,11 @@ function renderProperties(list) {
         </div>
       </div>
     `;
+
+    const favBtn = card.querySelector(".fav-btn");
+    favBtn.addEventListener("click", function () {
+      toggleFavorite(property.id);
+    });
 
     propertyGrid.appendChild(card);
   });
@@ -57,7 +88,6 @@ function applyFilters() {
   const selectedPurpose = purposeFilter.value;
   const selectedSort = sortSelect.value;
 
-  
   let result = properties.filter(function (property) {
     const matchesSearch =
       property.title.toLowerCase().includes(searchText) ||
@@ -69,10 +99,12 @@ function applyFilters() {
     const matchesPurpose =
       selectedPurpose === "all" || property.purpose === selectedPurpose;
 
-    return matchesSearch && matchesType && matchesPurpose;
+    const matchesFavorites =
+      !showOnlyFavorites || favorites.includes(property.id);
+
+    return matchesSearch && matchesType && matchesPurpose && matchesFavorites;
   });
 
-  
   if (selectedSort === "low") {
     result.sort(function (a, b) { return a.price - b.price; });
   } else if (selectedSort === "high") {
@@ -81,12 +113,19 @@ function applyFilters() {
 
   renderProperties(result);
 }
-  
+
 
 searchInput.addEventListener("input", applyFilters);
 typeFilter.addEventListener("change", applyFilters);
 purposeFilter.addEventListener("change", applyFilters);
 sortSelect.addEventListener("change", applyFilters);
 
+showFavoritesBtn.addEventListener("click", function () {
+  showOnlyFavorites = !showOnlyFavorites;
+  showFavoritesBtn.style.background = showOnlyFavorites ? "#2f855a" : "#ff5a5f";
+  applyFilters();
+});
 
+
+updateFavCount();
 applyFilters();
