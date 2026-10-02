@@ -365,3 +365,11 @@ main {
   font-weight: bold;
   color: #2f855a;
 }
+/* ---------- 10. Stop the background page from scrolling ---------- */
+body:has(.modal:not(.hidden)) {
+  overflow: hidden;
+}
+
+.modal-box {
+  overscroll-behavior: contain;
+}
