@@ -148,6 +148,22 @@ function openModal(property) {
       Math.round(property.price / property.area).toLocaleString("en-IN") +
       " per sqft</div>";
   }
+      let emiSection = "";
+  if (property.purpose === "sale") {
+    emiSection = `
+      <div class="emi-box">
+        <h3>🧮 EMI Calculator</h3>
+        <label>Down payment (%)</label>
+        <input type="number" id="emiDown" value="20">
+        <label>Interest rate (% per year)</label>
+        <input type="number" id="emiRate" value="8.5" step="0.1">
+        <label>Loan tenure (years)</label>
+        <input type="number" id="emiYears" value="20">
+        <button id="emiBtn" class="emi-btn">Calculate EMI</button>
+        <div id="emiResult" class="emi-result"></div>
+      </div>
+    `;
+  }
 
   modalContent.innerHTML = `
     <img src="${property.image}" alt="${property.title}">
@@ -163,10 +179,12 @@ function openModal(property) {
         <div>📐 ${property.area} sqft</div>
         ${pricePerSqft}
       </div>
+      ${emiSection}  
     </div>
   `;
 
   modal.classList.remove("hidden");
+  setupEmi(property);
 }
 
 function closeModal() {
@@ -268,5 +286,48 @@ propertyForm.addEventListener("submit", function (event) {
   closeForm();
   applyFilters();
 });
+
+function setupEmi(property) {
+  const emiBtn = document.getElementById("emiBtn");
+  if (!emiBtn) return; // rentals have no calculator
+
+  emiBtn.addEventListener("click", function () {
+    const downPercent = Number(document.getElementById("emiDown").value);
+    const yearlyRate = Number(document.getElementById("emiRate").value);
+    const years = Number(document.getElementById("emiYears").value);
+    const result = document.getElementById("emiResult");
+
+    
+    if (downPercent < 0 || downPercent > 90) {
+      result.innerHTML = "<span style='color:#e53e3e'>Down payment must be between 0 and 90%.</span>";
+      return;
+    }
+    if (yearlyRate <= 0 || yearlyRate > 30) {
+      result.innerHTML = "<span style='color:#e53e3e'>Interest rate must be between 0 and 30%.</span>";
+      return;
+    }
+    if (years < 1 || years > 30) {
+      result.innerHTML = "<span style='color:#e53e3e'>Tenure must be between 1 and 30 years.</span>";
+      return;
+    }
+
+    
+    const loanAmount = property.price - (property.price * downPercent) / 100;
+    const monthlyRate = yearlyRate / 12 / 100;
+    const months = years * 12;
+    const growth = Math.pow(1 + monthlyRate, months);
+    const emi = (loanAmount * monthlyRate * growth) / (growth - 1);
+    const totalPayment = emi * months;
+    const totalInterest = totalPayment - loanAmount;
+
+    result.innerHTML = `
+      <div>Monthly EMI</div>
+      <div class="emi-amount">₹${Math.round(emi).toLocaleString("en-IN")}</div>
+      <div>Loan amount: ₹${Math.round(loanAmount).toLocaleString("en-IN")}</div>
+      <div>Total interest: ₹${Math.round(totalInterest).toLocaleString("en-IN")}</div>
+      <div>Total payment: ₹${Math.round(totalPayment).toLocaleString("en-IN")}</div>
+    `;
+  });
+}
 updateFavCount();
 applyFilters();

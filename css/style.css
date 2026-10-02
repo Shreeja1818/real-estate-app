@@ -310,3 +310,58 @@ main {
     flex-direction: column;
   }
 }
+
+.emi-box {
+  background: #eef4fb;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.emi-box h3 {
+  margin-bottom: 10px;
+  color: #1e3a5f;
+}
+
+.emi-box label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.emi-box input {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.emi-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #1e3a5f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.emi-btn:hover {
+  background: #2c5282;
+}
+
+.emi-result {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.emi-result .emi-amount {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2f855a;
+}
