@@ -11,7 +11,10 @@
  
   <header class="navbar">
     <h1 class="logo">🏠 HomeFinder</h1>
-    <button id="showFavorites" class="nav-btn">❤️ Saved (<span id="favCount">0</span>)</button>
+        <div class="nav-actions">
+      <button id="addPropertyBtn" class="nav-btn add-btn">➕ Add Property</button>
+      <button id="showFavorites" class="nav-btn">❤️ Saved (<span id="favCount">0</span>)</button>
+    </div>
   </header>
 
   
@@ -53,6 +56,65 @@
     <div class="modal-box">
       <button id="closeModal" class="close-btn">✖</button>
       <div id="modalContent"></div>
+    </div>
+  </div>
+      
+  <div id="formModal" class="modal hidden">
+    <div class="modal-box">
+      <button id="closeForm" class="close-btn">✖</button>
+      <div class="modal-info">
+        <h2>Add New Property</h2>
+        <p id="formError" class="form-error"></p>
+
+        <form id="propertyForm">
+          <label>Title</label>
+          <input type="text" id="fTitle" placeholder="e.g. Modern 3BHK Villa">
+
+          <label>City</label>
+          <input type="text" id="fCity" placeholder="e.g. Coimbatore">
+
+          <div class="form-row">
+            <div>
+              <label>Type</label>
+              <select id="fType">
+                <option value="house">House</option>
+                <option value="apartment">Apartment</option>
+                <option value="villa">Villa</option>
+                <option value="plot">Plot</option>
+              </select>
+            </div>
+            <div>
+              <label>For</label>
+              <select id="fPurpose">
+                <option value="sale">Sale</option>
+                <option value="rent">Rent</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Price (₹)</label>
+          <input type="number" id="fPrice" placeholder="e.g. 5000000">
+
+          <div class="form-row">
+            <div>
+              <label>Bedrooms</label>
+              <input type="number" id="fBedrooms" value="0">
+            </div>
+            <div>
+              <label>Bathrooms</label>
+              <input type="number" id="fBathrooms" value="0">
+            </div>
+          </div>
+
+          <label>Area (sqft)</label>
+          <input type="number" id="fArea" placeholder="e.g. 1500">
+
+          <label>Image link (optional)</label>
+          <input type="text" id="fImage" placeholder="https://...">
+
+          <button type="submit" class="submit-btn">Save Property</button>
+        </form>
+      </div>
     </div>
   </div>
   <script src="js/data.js"></script>

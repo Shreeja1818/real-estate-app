@@ -7,7 +7,8 @@ const showFavoritesBtn = document.getElementById("showFavorites");
 
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 let showOnlyFavorites = false;
-
+let userProperties = JSON.parse(localStorage.getItem("userProperties")) || [];
+let allProperties = properties.concat(userProperties);
 
 function formatPrice(price, purpose) {
   const formatted = "₹" + price.toLocaleString("en-IN");
@@ -93,7 +94,7 @@ function applyFilters() {
   const selectedPurpose = purposeFilter.value;
   const selectedSort = sortSelect.value;
 
-  let result = properties.filter(function (property) {
+  let result = allProperties.filter(function (property) {
     const matchesSearch =
       property.title.toLowerCase().includes(searchText) ||
       property.city.toLowerCase().includes(searchText);
@@ -184,6 +185,88 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     closeModal();
   }
+});
+// ---------- 11. Add property form ----------
+const formModal = document.getElementById("formModal");
+const addPropertyBtn = document.getElementById("addPropertyBtn");
+const closeFormBtn = document.getElementById("closeForm");
+const propertyForm = document.getElementById("propertyForm");
+const formError = document.getElementById("formError");
+
+function openForm() {
+  formError.textContent = "";
+  formModal.classList.remove("hidden");
+}
+
+function closeForm() {
+  formModal.classList.add("hidden");
+}
+
+addPropertyBtn.addEventListener("click", openForm);
+closeFormBtn.addEventListener("click", closeForm);
+
+formModal.addEventListener("click", function (event) {
+  if (event.target === formModal) {
+    closeForm();
+  }
+});
+
+propertyForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const title = document.getElementById("fTitle").value.trim();
+  const city = document.getElementById("fCity").value.trim();
+  const type = document.getElementById("fType").value;
+  const purpose = document.getElementById("fPurpose").value;
+  const price = Number(document.getElementById("fPrice").value);
+  const bedrooms = Number(document.getElementById("fBedrooms").value);
+  const bathrooms = Number(document.getElementById("fBathrooms").value);
+  const area = Number(document.getElementById("fArea").value);
+  let image = document.getElementById("fImage").value.trim();
+
+  
+  if (title === "" || city === "") {
+    formError.textContent = "Please enter the title and city.";
+    return;
+  }
+  if (price <= 0) {
+    formError.textContent = "Price must be greater than 0.";
+    return;
+  }
+  if (area <= 0) {
+    formError.textContent = "Area must be greater than 0.";
+    return;
+  }
+  if (bedrooms < 0 || bathrooms < 0) {
+    formError.textContent = "Bedrooms and bathrooms cannot be negative.";
+    return;
+  }
+
+  
+  if (image === "") {
+    image = "https://picsum.photos/seed/" + Date.now() + "/400/300";
+  }
+
+  const newProperty = {
+    id: Date.now(),
+    title: title,
+    type: type,
+    purpose: purpose,
+    price: price,
+    city: city,
+    bedrooms: bedrooms,
+    bathrooms: bathrooms,
+    area: area,
+    image: image
+  };
+
+  userProperties.push(newProperty);
+  localStorage.setItem("userProperties", JSON.stringify(userProperties));
+  allProperties = properties.concat(userProperties);
+
+  propertyForm.reset();
+  closeForm();
+  applyFilters();
 });
 updateFavCount();
 applyFilters();
