@@ -1,14 +1,14 @@
-// ---------- 1. Get HTML elements ----------
+
 const propertyGrid = document.getElementById("propertyGrid");
 const resultCount = document.getElementById("resultCount");
 
-// ---------- 2. Format price in Indian style ----------
+
 function formatPrice(price, purpose) {
   const formatted = "₹" + price.toLocaleString("en-IN");
   return purpose === "rent" ? formatted + "/month" : formatted;
 }
 
-// ---------- 3. Show cards on the page ----------
+
 function renderProperties(list) {
   propertyGrid.innerHTML = "";
 
@@ -44,5 +44,49 @@ function renderProperties(list) {
   resultCount.textContent = list.length + " properties found";
 }
 
-// ---------- 4. Run when the page loads ----------
-renderProperties(properties);
+
+const searchInput = document.getElementById("searchInput");
+const typeFilter = document.getElementById("typeFilter");
+const purposeFilter = document.getElementById("purposeFilter");
+const sortSelect = document.getElementById("sortSelect");
+
+
+function applyFilters() {
+  const searchText = searchInput.value.toLowerCase().trim();
+  const selectedType = typeFilter.value;
+  const selectedPurpose = purposeFilter.value;
+  const selectedSort = sortSelect.value;
+
+  
+  let result = properties.filter(function (property) {
+    const matchesSearch =
+      property.title.toLowerCase().includes(searchText) ||
+      property.city.toLowerCase().includes(searchText);
+
+    const matchesType =
+      selectedType === "all" || property.type === selectedType;
+
+    const matchesPurpose =
+      selectedPurpose === "all" || property.purpose === selectedPurpose;
+
+    return matchesSearch && matchesType && matchesPurpose;
+  });
+
+  
+  if (selectedSort === "low") {
+    result.sort(function (a, b) { return a.price - b.price; });
+  } else if (selectedSort === "high") {
+    result.sort(function (a, b) { return b.price - a.price; });
+  }
+
+  renderProperties(result);
+}
+  
+
+searchInput.addEventListener("input", applyFilters);
+typeFilter.addEventListener("change", applyFilters);
+purposeFilter.addEventListener("change", applyFilters);
+sortSelect.addEventListener("change", applyFilters);
+
+
+applyFilters();
